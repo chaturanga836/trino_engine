@@ -1,0 +1,52 @@
+
+services:
+  trino:
+    image: trinodb/trino:476
+    container_name: trino
+    ports:
+      - "4001:8080"
+    volumes:
+      - /home/ubuntu/storage_system/trino/config:/etc/trino
+      - trino-data:/var/lib/trino/data
+    environment:
+      - CATALOG_MANAGEMENT=dynamic
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/v1/info"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trino-net
+    depends_on:
+      - auth-service
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: trino-auth
+    ports:
+      - "7000:7000"
+    environment:
+      - APP_ENV=prod
+      - JWT_SECRET=mysecret
+      # ✅ connect to your existing PostgreSQL (replace host/IP)
+      - DATABASE_URL=postgresql://postgres:2324@ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:5432/auth_db
+      # ✅ connect to Ranger (in another repo)
+      - RANGER_BASE_URL=http://65.0.150.75:6080
+      - RANGER_USER=admin
+      - RANGER_PASSWORD=ranger_admin_password
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - trino-net
+
+volumes:
+  trino-data:
+
+networks:
+  trino-net:
+    driver: bridge
