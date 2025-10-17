@@ -7,6 +7,8 @@ services:
       - "4001:8080"
     volumes:
       - /home/ubuntu/storage_system/trino/config:/etc/trino
+      - /home/ubuntu/storage_system/trino/config/plugin/ranger-trino-plugin.jar:/usr/lib/trino/plugin/ranger/ranger-trino-plugin.jar
+      - /home/ubuntu/storage_system/trino/config/plugin/trino-ranger-plugin-logback.xml:/usr/lib/trino/plugin/ranger/trino-ranger-plugin-logback.xml
       - trino-data:/var/lib/trino/data
     environment:
       - CATALOG_MANAGEMENT=dynamic
@@ -30,9 +32,7 @@ services:
     environment:
       - APP_ENV=prod
       - JWT_SECRET=mysecret
-      # ✅ connect to your existing PostgreSQL (replace host/IP)
       - DATABASE_URL=postgresql://postgres:2324@ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:5432/auth_db
-      # ✅ connect to Ranger (in another repo)
       - RANGER_BASE_URL=http://65.0.150.75:6080
       - RANGER_USER=admin
       - RANGER_PASSWORD=ranger_admin_password
