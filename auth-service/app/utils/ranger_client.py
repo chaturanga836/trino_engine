@@ -1,22 +1,35 @@
+import os
 import requests
 from fastapi import HTTPException
 
-RANGER_BASE_URL = "http://ranger-admin:6080"  # internal Docker hostname
-RANGER_USER = "admin"
-RANGER_PASSWORD = "ranger_admin_password"
+# Load configuration from environment variables
+RANGER_BASE_URL = os.getenv("RANGER_BASE_URL", "http://ranger-admin:6080")
+RANGER_USER = os.getenv("RANGER_USER", "admin")
+RANGER_PASSWORD = os.getenv("RANGER_PASSWORD", "ranger_admin_password")
 
-def check_access(user, resource, action):
+def check_access(user: str, resource: str, action: str) -> bool:
     """
-    Calls Ranger API to check if user has permission for a specific action.
+    Calls Apache Ranger REST API to check if a user has permission for a specific action.
     """
-    url = f"{RANGER_BASE_URL}/service/public/v2/api/policy"
-    resp = requests.get(url, auth=(RANGER_USER, RANGER_PASSWORD))
-    if resp.status_code != 200:
-        raise HTTPException(status_code=500, detail="Ranger unavailable")
-    
-    policies = resp.json()
-    for policy in policies:
-        for perm in policy.get("policyItems", []):
-            if user in perm.get("users", []) and action in perm.get("accesses", []):
-                return True
-    return False
+    try:
+        # Example API call – adjust to match your Ranger policy setup
+        url = f"{RANGER_BASE_URL}/service/plugins/policies"
+        resp = requests.get(url, auth=(RANGER_USER, RANGER_PASSWORD), timeout=5)
+
+        if resp.status_code != 200:
+            raise HTTPException(status_code=500, detail=f"Ranger API error: {resp.status_code}")
+
+        policies = resp.json()
+
+        for policy in policies:
+            for item in policy.get("policyItems", []):
+                users = item.get("users", [])
+                accesses = [a.get("type") for a in item.get("accesses", [])]
+
+                if user in users and action in accesses:
+                    return True
+
+        return False
+
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"Ranger request failed: {str(e)}")
