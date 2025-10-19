@@ -1,4 +1,3 @@
-
 services:
   trino:
     image: trinodb/trino:476
@@ -10,6 +9,7 @@ services:
       - /home/ubuntu/storage_system/trino/config/plugin/ranger-trino-plugin.jar:/usr/lib/trino/plugin/ranger/ranger-trino-plugin.jar
       - /home/ubuntu/storage_system/trino/config/plugin/trino-ranger-plugin-logback.xml:/usr/lib/trino/plugin/ranger/trino-ranger-plugin-logback.xml
       - trino-data:/var/lib/trino/data
+      - ./public_key.pem:/etc/trino/public_key.pem:ro
     environment:
       - CATALOG_MANAGEMENT=dynamic
     healthcheck:
@@ -31,11 +31,16 @@ services:
       - "7000:7000"
     environment:
       - APP_ENV=prod
-      - JWT_SECRET=mysecret
       - DATABASE_URL=postgresql://postgres:2324@ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:5432/auth_db
       - RANGER_BASE_URL=http://65.0.150.75:6080
       - RANGER_USER=admin
       - RANGER_PASSWORD=ranger_admin_password
+      - PRIVATE_KEY_PATH=/app/keys/trino_private.pem
+      - PUBLIC_KEY_PATH=/app/keys/public_key.pem
+      - JWT_ISSUER=http://trino-auth:7000
+    volumes:
+      - ./trino_private.pem:/app/keys/trino_private.pem:ro
+      - ./public_key.pem:/app/keys/public_key.pem:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7000/health"]
       interval: 10s

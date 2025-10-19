@@ -1,7 +1,18 @@
 # app/utils/security.py
+from datetime import datetime, timedelta, timezone
+import os
+from jose import jwt
 from pwdlib import PasswordHash
 
-# Create a recommended hasher (defaults to Argon2)
+ALGORITHM = "RS256"
+ACCESS_TOKEN_EXPIRE_SECONDS = 3600  # 1 hour
+
+# Read from environment or fallback to defaults
+PRIVATE_KEY_PATH = os.getenv("PRIVATE_KEY_PATH", "/app/keys/trino_private.pem")
+PUBLIC_KEY_PATH = os.getenv("PUBLIC_KEY_PATH", "/app/keys/public_key.pem")
+JWT_ISSUER = os.getenv("JWT_ISSUER", "http://localhost:7000")
+
+# Initialize password hasher (Argon2 by default)
 password_hasher = PasswordHash.recommended()
 
 def hash_password(password: str) -> str:
@@ -11,3 +22,14 @@ def hash_password(password: str) -> str:
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a stored password against one provided by user."""
     return password_hasher.verify(plain_password, hashed_password)
+
+# Load private key (RS256 signing key)
+with open(PRIVATE_KEY_PATH, "rb") as f:
+    PRIVATE_KEY = f.read()
+
+# JWT creation function
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
+    to_encode.update({"exp": expire, "iss": JWT_ISSUER})
+    return jwt.encode(to_encode, PRIVATE_KEY, algorithm=ALGORITHM)
