@@ -53,3 +53,7 @@ def root():
         "version": "1.0.0",
         "environment": os.getenv("APP_ENV", "dev")
     }
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
