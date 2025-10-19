@@ -6,23 +6,18 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 import base64
 from app.utils.security import PUBLIC_KEY_PATH
 
-router = APIRouter(prefix="/jwks", tags=["JWKS"])
+router = APIRouter(tags=["JWKS"])  # No prefix, so the URL matches exactly
 
-def pem_to_jwk(pem_path: str, kid: str = "trino-key-1") -> dict:
-    """
-    Convert RSA public key PEM file to JWKS format.
-    """
-    with open(pem_path, "rb") as f:
-        public_key = serialization.load_pem_public_key(f.read())
-    
-    if not isinstance(public_key, rsa.RSAPublicKey):
-        raise ValueError("Provided key is not an RSA public key")
+# Load the public key once at startup
+with open(PUBLIC_KEY_PATH, "rb") as f:
+    PUBLIC_KEY_OBJ = serialization.load_pem_public_key(f.read())
 
+def rsa_public_key_to_jwk(public_key: rsa.RSAPublicKey, kid: str = "trino-key-1") -> dict:
+    """Convert RSA public key to a JWKS dict."""
     numbers = public_key.public_numbers()
     n = numbers.n
     e = numbers.e
 
-    # Convert integers to base64url-encoded strings
     def int_to_base64url(x: int) -> str:
         b = x.to_bytes((x.bit_length() + 7) // 8, "big")
         return base64.urlsafe_b64encode(b).rstrip(b"=").decode("utf-8")
@@ -39,5 +34,5 @@ def pem_to_jwk(pem_path: str, kid: str = "trino-key-1") -> dict:
 
 @router.get("/.well-known/jwks.json")
 def jwks():
-    jwk = pem_to_jwk(PUBLIC_KEY_PATH)
+    jwk = rsa_public_key_to_jwk(PUBLIC_KEY_OBJ)
     return JSONResponse(content={"keys": [jwk]})
