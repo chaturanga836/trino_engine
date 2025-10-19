@@ -27,9 +27,19 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 with open(PRIVATE_KEY_PATH, "rb") as f:
     PRIVATE_KEY = f.read()
 
-# JWT creation function
-def create_access_token(data: dict) -> str:
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS)
-    to_encode.update({"exp": expire, "iss": JWT_ISSUER})
-    return jwt.encode(to_encode, PRIVATE_KEY, algorithm=ALGORITHM)
+def create_access_token(subject: str, extra_claims: dict = None) -> str:
+    """
+    Generate a JWT for the given subject (sub).
+    Adds 'iss' field and optional extra claims.
+    """
+    payload = {
+        "sub": subject,
+        "exp": datetime.now(timezone.utc) + timedelta(seconds=ACCESS_TOKEN_EXPIRE_SECONDS),
+        "iss": JWT_ISSUER
+    }
+
+    if extra_claims:
+        payload.update(extra_claims)
+
+    token = jwt.encode(payload, PRIVATE_KEY, algorithm=ALGORITHM)
+    return token

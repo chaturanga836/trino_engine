@@ -44,7 +44,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         )
 
     # Generate JWT Access Token
-    token = jwt_handler.create_access_token({"sub": user.username})
+    token = jwt_handler.create_access_token(user.username)
     return {"access_token": token, "token_type": "bearer"}
 
 
