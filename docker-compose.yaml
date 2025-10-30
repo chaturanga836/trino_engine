@@ -7,10 +7,10 @@ services:
     volumes:
       - /home/ubuntu/trino_engine/config:/etc/trino
       - /home/ubuntu/trino_engine/config/plugin/ranger-trino-plugin.jar:/usr/lib/trino/plugin/ranger/ranger-trino-plugin.jar
-      - /home/ubuntu/trino_engine/config/plugin/trino-ranger-plugin-logback.xml:/usr/lib/trino/plugin/ranger/trino-ranger-plugin-logback.xml
-      - trino-data:/var/lib/trino/data
-      - /home/ubuntu/trino_engine/auth-service/app/keys/public_key.pem:/etc/trino/public_key.pem:ro
-      - ./public_key.pem:/etc/trino/public_key.pem:ro
+      # - /home/ubuntu/trino_engine/config/plugin/trino-ranger-plugin-logback.xml:/usr/lib/trino/plugin/ranger/trino-ranger-plugin-logback.xml
+      # - trino-data:/var/lib/trino/data
+      # - /home/ubuntu/trino_engine/auth-service/app/keys/public_key.pem:/etc/trino/public_key.pem:ro
+      # - ./public_key.pem:/etc/trino/public_key.pem:ro
     environment:
       - CATALOG_MANAGEMENT=dynamic
     healthcheck:
