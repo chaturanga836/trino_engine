@@ -1,6 +1,6 @@
 services:
   trino:
-    image: trinodb/trino:476
+    image: trinodb/trino:480
     container_name: trino
     ports:
       - "4001:8080"
