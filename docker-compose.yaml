@@ -36,7 +36,7 @@ services:
       - DATABASE_URL=postgresql://postgres:2324@ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:5432/auth_db
       - RANGER_BASE_URL=http://65.0.150.75:6080
       - RANGER_USER=admin
-      - RANGER_PASSWORD=ranger_admin_password
+      - RANGER_PASSWORD=Admin@123
       - PRIVATE_KEY_PATH=/app/keys/trino_private.pem
       - PUBLIC_KEY_PATH=/app/keys/public_key.pem
       - JWT_ISSUER=http://trino-auth:7000
