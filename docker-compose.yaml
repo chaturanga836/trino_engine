@@ -19,7 +19,8 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - trino-net
+      - trino-ranger-net
+      - ldap_service_ldap_network
     depends_on:
       - auth-service
 
@@ -48,11 +49,13 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - trino-net
+      - trino-ranger-net
 
 volumes:
   trino-data:
 
 networks:
-  trino-net:
+  trino-ranger-net:
     driver: bridge
+  ldap_service_ldap_network:
+    external: true
