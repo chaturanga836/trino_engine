@@ -27,6 +27,7 @@ services:
   trino:
     image: trinodb/trino:477
     container_name: trino
+    hostname: trino
     depends_on:
       - trino-certgen
       - auth-service
