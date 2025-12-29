@@ -27,7 +27,7 @@ services:
       # Ranger plugin
       - /home/ubuntu/trino_engine/config/plugin:/usr/lib/trino/plugin/ranger
       # Keystore volume
-      - trino-certs:/certs
+      - ./trino-certs:/certs:ro
     environment:
       - CATALOG_MANAGEMENT=dynamic
     healthcheck:
