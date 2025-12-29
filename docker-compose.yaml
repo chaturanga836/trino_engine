@@ -23,12 +23,12 @@ services:
       - "4001:8443"
     volumes:
       # Main config
-      - /home/ubuntu/trino_engine/config:/etc/trino
+      - ./config:/etc/trino
       # Ranger plugin
-      - /home/ubuntu/trino_engine/config/plugin:/usr/lib/trino/plugin/ranger
+      - ./config/plugin:/usr/lib/trino/plugin/ranger
       # Keystore volume
       - ./trino-certs:/certs:ro
-      - trino-data:/var/trino/data
+      - ./trino-data:/var/trino/data
     environment:
       - CATALOG_MANAGEMENT=dynamic
     healthcheck:
