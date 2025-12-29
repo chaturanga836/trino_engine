@@ -29,7 +29,7 @@ services:
       - ./config/plugin:/usr/lib/trino/plugin/ranger
       # Keystore volume
       - ./trino-certs:/certs:ro
-      - ./trino-data:/var/trino/data
+      - trino-data:/var/trino/data
     environment:
       - CATALOG_MANAGEMENT=dynamic
     healthcheck:
