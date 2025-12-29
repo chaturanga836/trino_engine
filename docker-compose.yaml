@@ -7,7 +7,7 @@ services:
     image: eclipse-temurin:17-jdk
     container_name: trino-certgen
     volumes:
-      - trino-certs:/certs
+      - ./trino-certs:/certs
     entrypoint: >
          sh -c "if [ ! -f /certs/keystore.jks ]; then echo 'Generating Trino TLS keystore'; keytool -genkeypair -alias trino -keyalg RSA -keysize 2048 -validity 3650 -keystore /certs/keystore.jks -storepass changeit -keypass changeit -dname 'CN=trino, OU=IT, O=MyCompany, L=City, S=State, C=US'; fi"
 
