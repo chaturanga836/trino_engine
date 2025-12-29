@@ -46,7 +46,7 @@ services:
       test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      # retries: 5
     networks:
       - trino-ranger-net
       - ldap_service_ldap_network
