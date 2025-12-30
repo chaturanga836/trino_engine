@@ -20,7 +20,7 @@ services:
       - trino-certgen
       - auth-service
     ports:
-      - "4001:8080"
+      - "4001:8443"
     volumes:
       # Main config
       - ./config:/etc/trino
