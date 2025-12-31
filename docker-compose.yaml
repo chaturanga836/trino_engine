@@ -31,7 +31,7 @@ services:
       # - trino-data:/var/trino/data
     environment:
       - CATALOG_MANAGEMENT=dynamic
-      # - JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
+      - JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
     healthcheck:
       test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
       interval: 10s
