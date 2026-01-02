@@ -1,0 +1,27 @@
+FROM trinodb/trino:479
+
+ENV TRINO_CONFIG=/etc/trino
+ENV TRINO_CERTS=/etc/trino/certs
+
+USER root
+RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS}
+
+COPY config/ ${TRINO_CONFIG}/
+
+COPY trino-certs/ca.crt ${TRINO_CERTS}/ca.crt
+COPY trino-certs/keystore.jks ${TRINO_CERTS}/keystore.jks
+
+RUN keytool -importcert \
+    -alias ldap-ca \
+    -file ${TRINO_CERTS}/ca.crt \
+    -keystore ${TRINO_CERTS}/ldap-truststore.jks \
+    -storepass changeit \
+    -noprompt
+
+RUN mkdir -p /var/trino/data && \
+    chown -R trino:trino \
+      /var/trino \
+      ${TRINO_CONFIG} \
+      ${TRINO_CERTS}
+
+USER trino

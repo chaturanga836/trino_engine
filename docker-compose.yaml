@@ -13,7 +13,9 @@ services:
 
   # 🐳 Trino service
   trino:
-    image: trinodb/trino:479
+    build:
+      context: .
+      dockerfile: Dockerfile.trino
     container_name: trino
     hostname: trino
     depends_on:
