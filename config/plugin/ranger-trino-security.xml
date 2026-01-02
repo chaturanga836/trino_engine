@@ -3,7 +3,7 @@
 
   <property>
     <name>ranger.plugin.trino.service.name</name>
-    <value>trino</value>
+    <value>TRINO_SERVICE</value>
   </property>
 
   <property>
