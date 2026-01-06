@@ -1,20 +1,16 @@
 FROM trinodb/trino:479
 
+# Move certs OUTSIDE of the /etc/trino path to avoid volume masking
 ENV TRINO_CONFIG=/etc/trino
-ENV TRINO_CERTS=/etc/trino/certs
+ENV TRINO_CERTS=/usr/lib/trino/certs 
 
 USER root
 RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS}
 
-# 1. Copy the configuration
 COPY config/ ${TRINO_CONFIG}/
-
-# 2. Copy the certificates 
-# Note: Ensure these files exist in your local trino-certs/ folder before build
 COPY trino-certs/tls.crt ${TRINO_CERTS}/ca.crt
 COPY trino-certs/keystore.jks ${TRINO_CERTS}/keystore.jks
-# 3. Import LDAP CA into the EXISTING keystore
-# This is the critical step to fix the PKIX error
+
 RUN keytool -importcert \
     -alias ldap-ca \
     -file ${TRINO_CERTS}/ca.crt \
@@ -22,12 +18,8 @@ RUN keytool -importcert \
     -storepass changeit \
     -noprompt
 
-# 4. Setup directories and permissions
 RUN mkdir -p /var/trino/data && \
-    chown -R trino:trino \
-      /var/trino \
-      ${TRINO_CONFIG} \
-      ${TRINO_CERTS}
+    chown -R trino:trino /var/trino ${TRINO_CONFIG} ${TRINO_CERTS}
 
 RUN ln -s ${TRINO_CONFIG}/plugin/ranger-trino-security.xml ${TRINO_CONFIG}/ranger-trino-security.xml
 
