@@ -13,35 +13,34 @@ services:
 
   # 🐳 Trino service
   trino:
-    build:
-      context: .
-      dockerfile: Dockerfile.trino
-    container_name: trino
-    hostname: trino
-    depends_on:
-      - trino-certgen
-      - auth-service
-    ports:
-      - "8443:8443"
-    volumes:
-      # Main config
-      - ./config:/etc/trino
-      # Ranger plugin
-      - ./config/plugin:/usr/lib/trino/plugin/ranger
-      # Keystore volume
-      - ./trino-certs:/certs:ro
-      # - trino-data:/var/trino/data
-    environment:
-      - CATALOG_MANAGEMENT=dynamic
-      - JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
-    healthcheck:
-      test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
-      interval: 10s
-      timeout: 5s
-      # retries: 5
-    networks:
-      - trino-ranger-net
-      - ldap_service_ldap_network
+      build:
+        context: .
+        dockerfile: Dockerfile.trino
+      container_name: trino
+      hostname: trino
+      depends_on:
+        - trino-certgen
+        - auth-service
+      ports:
+        - "8443:8443"
+      volumes:
+        # 1. Main config mapping
+        - ./config:/etc/trino
+        # 2. Ranger plugin libraries (must match the Dockerfile chown path)
+        - ./config/plugin:/usr/lib/trino/plugin/ranger
+        # 3. IMPORTANT: DO NOT mount ./trino-certs:/certs here. 
+        # Doing so would overwrite the keystore you updated in the Dockerfile.
+      environment:
+        - CATALOG_MANAGEMENT=dynamic
+        # 4. Point to the BOKED-IN path from your Dockerfile
+        - JAVA_TOOL_OPTIONS=-Djavax.net.ssl.trustStore=/etc/trino/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
+      healthcheck:
+        test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
+        interval: 10s
+        timeout: 5s
+      networks:
+        - trino-ranger-net
+        - ldap_service_ldap_network
 
   # 🛡️ Auth-service for JWT
   auth-service:
