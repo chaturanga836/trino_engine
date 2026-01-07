@@ -64,4 +64,20 @@
     <name>ranger.plugin.trino.ugi.initialize</name>
     <value>false</value>
   </property>
+
+  <property>
+    <name>ranger.plugin.trino.policy.rest.client.connection.timeoutMs</name>
+    <value>120000</value>
+  </property>
+
+  <property>
+    <name>ranger.plugin.trino.policy.rest.client.read.timeoutMs</name>
+    <value>30000</value>
+  </property>
+
+  <property>
+    <name>ranger.plugin.trino.policy.rest.client.max.retries</name>
+    <value>3</value>
+  </property>
+  
 </configuration>
