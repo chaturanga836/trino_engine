@@ -19,6 +19,11 @@
     <value>admin</value>
   </property>
 
+<property>
+    <name>ranger.plugin.trino.policy.source.impl</name>
+    <value>org.apache.ranger.admin.client.RangerAdminRESTClient</value>
+  </property>
+  
   <property>
     <name>ranger.plugin.trino.policy.rest.password</name>
     <value>Admin@123</value>
