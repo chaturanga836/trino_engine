@@ -5,6 +5,8 @@ ENV TRINO_CERTS=/usr/lib/trino/certs
 
 USER root
 
+RUN yum install -y openldap-clients && yum clean all
+
 RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS} /usr/lib/trino/plugin/ranger /var/trino/data
 
 # Copy the certs
