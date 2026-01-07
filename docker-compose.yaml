@@ -30,7 +30,7 @@ services:
         # 1. Main config mapping
         - ./config:/etc/trino
         # 2. Ranger plugin libraries (must match the Dockerfile chown path)
-        - ./config/plugin:/usr/lib/trino/plugin/ranger
+        - ./plugin:/usr/lib/trino/plugin/ranger
         # 3. IMPORTANT: DO NOT mount ./trino-certs:/certs here. 
         # Doing so would overwrite the keystore you updated in the Dockerfile.
       healthcheck:

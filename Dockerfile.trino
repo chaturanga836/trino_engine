@@ -1,26 +1,31 @@
 FROM trinodb/trino:479
 
-# Move certs OUTSIDE of the /etc/trino path to avoid volume masking
+# Define paths
 ENV TRINO_CONFIG=/etc/trino
 ENV TRINO_CERTS=/usr/lib/trino/certs 
 
 USER root
-RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS}
 
-COPY config/ ${TRINO_CONFIG}/
+# Create directories
+RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS} /usr/lib/trino/plugin/ranger
+
+# Copy only the certs (Configs are handled by the volume mount in compose)
 COPY trino-certs/tls.crt ${TRINO_CERTS}/ca.crt
 COPY trino-certs/keystore.jks ${TRINO_CERTS}/keystore.jks
 
+# Import LDAP cert into keystore
 RUN keytool -importcert \
     -alias ldap-ca \
     -file ${TRINO_CERTS}/ca.crt \
     -keystore ${TRINO_CERTS}/keystore.jks \
     -storepass changeit \
-    -noprompt
+    -noprompt || true
 
-RUN mkdir -p /var/trino/data && \
-    chown -R trino:trino /var/trino ${TRINO_CONFIG} ${TRINO_CERTS}
+# Fix permissions for the trino user
+RUN chown -R trino:trino /usr/lib/trino/plugin/ranger ${TRINO_CERTS}
 
-RUN ln -s ${TRINO_CONFIG}/plugin/ranger-trino-security.xml ${TRINO_CONFIG}/ranger-trino-security.xml
+# Fix the Ranger Symbolic Link
+# This now points to where your volume mount puts the ranger files
+RUN ln -sf /usr/lib/trino/plugin/ranger/ranger-trino-security.xml ${TRINO_CONFIG}/ranger-trino-security.xml
 
 USER trino
