@@ -10,7 +10,7 @@
   <!-- URL to Ranger Admin (HTTP, not HTTPS) -->
   <property>
     <name>ranger.plugin.trino.policy.rest.url</name>
-    <value>http://ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:6080</value>
+    <value>http://144.24.127.112:6080</value>
   </property>
 
   <!-- Ranger Admin credentials -->
