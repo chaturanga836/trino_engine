@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy source code
 COPY ./app ./app
 COPY .env ./  
-COPY prestart.py ./
+COPY appprestart.py ./
 # Expose port
 EXPOSE 7000
 
