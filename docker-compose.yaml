@@ -54,8 +54,8 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - APP_ENV=prod
-      - DATABASE_URL=postgresql://postgres:2324@144.24.127:5432/auth_db
-      - RANGER_BASE_URL=http://144.24.127:6080
+      - DATABASE_URL=postgresql://postgres:2324@144.24.127.112:5432/auth_db
+      - RANGER_BASE_URL=http://144.24.127.112:6080
       - RANGER_USER=admin
       - RANGER_PASSWORD=Admin@123
       - PRIVATE_KEY_PATH=/app/keys/trino_private.pem
