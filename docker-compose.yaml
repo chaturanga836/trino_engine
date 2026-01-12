@@ -52,6 +52,7 @@ services:
     ports:
       - "7000:7000"
     environment:
+      - PYTHONUNBUFFERED=1
       - APP_ENV=prod
       - DATABASE_URL=postgresql://postgres:2324@ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:5432/auth_db
       - RANGER_BASE_URL=http://65.0.150.75:6080
