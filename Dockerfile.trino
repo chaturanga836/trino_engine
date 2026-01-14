@@ -10,6 +10,7 @@ RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS} /usr/lib/trino/plugin/ranger /var/tr
 
 # Copy the certs
 COPY trino-certs/ca.crt ${TRINO_CERTS}/ca.crt
+COPY trino-certs/keystore.jks ${TRINO_CERTS}/keystore.jks
 # COPY trino-certs/keystore.jks ${TRINO_CERTS}/keystore.jks
 
 # FIX: Delete the alias if it exists before importing to ensure the NEW cert is used
