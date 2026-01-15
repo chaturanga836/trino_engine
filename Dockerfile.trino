@@ -20,8 +20,13 @@ RUN keytool -delete -alias ldap-ca -keystore ${TRINO_CERTS}/keystore.jks -storep
     -file ${TRINO_CERTS}/ca.crt \
     -keystore ${TRINO_CERTS}/keystore.jks \
     -storepass changeit \
-    -noprompt
-
+    -noprompt && \
+    keytool -keypasswd \
+    -alias trino-server \
+    -keystore ${TRINO_CERTS}/keystore.jks \
+    -storepass changeit \
+    -keypass changeit \
+    -new changeit
 # Fix permissions
 RUN chown -R trino:trino /usr/lib/trino/plugin/ranger ${TRINO_CERTS} /var/trino /etc/trino
 
