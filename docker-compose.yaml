@@ -23,6 +23,7 @@ services:
         - auth-service
       ports:
         - "8443:8443"
+        - "4001:8080"
       extra_hosts:
         - "ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:65.0.150.75"
       environment:
