@@ -21,6 +21,7 @@ RUN keytool -delete -alias ldap-ca -keystore ${TRINO_CERTS}/keystore.jks -storep
     -keystore ${TRINO_CERTS}/keystore.jks \
     -storepass changeit \
     -noprompt && \
+    # THIS LINE FIXES THE ILLEGALARGUMENTEXCEPTION
     keytool -keypasswd \
     -alias trino-server \
     -keystore ${TRINO_CERTS}/keystore.jks \
