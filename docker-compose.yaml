@@ -22,9 +22,9 @@ services:
       depends_on:
         - trino-certgen
         - auth-service
-      ports:
-        - "8443:8443"
-        - "4001:8080"
+      # ports:
+      #   - "8443:8443"
+      #   - "4001:8080"
       extra_hosts:
        - "host.docker.internal:host-gateway"
       environment:
