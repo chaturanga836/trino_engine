@@ -18,15 +18,15 @@ services:
         dockerfile: Dockerfile.trino
       container_name: trino
       hostname: trino
-      network_mode: "host"
+      
       depends_on:
         - trino-certgen
         - auth-service
-      # ports:
-      #   - "8443:8443"
-      #   - "4001:8080"
-      extra_hosts:
-       - "host.docker.internal:host-gateway"
+      ports:
+        - "8443:8443"
+        - "4001:8080"
+      # extra_hosts:
+      #   - "ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:65.0.150.75"
       environment:
         - CATALOG_MANAGEMENT=dynamic
         - JAVA_TOOL_OPTIONS=-Djdk.tls.client.protocols=TLSv1.2 -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Djavax.net.ssl.trustStore=/usr/lib/trino/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
@@ -71,8 +71,8 @@ services:
       interval: 10s
       timeout: 5s
       # retries: 5
-    # networks:
-    #   - trino-ranger-net
+    networks:
+      - trino-ranger-net
 
 # 🔹 Volumes
 volumes:
