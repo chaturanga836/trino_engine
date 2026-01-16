@@ -71,8 +71,8 @@ services:
       interval: 10s
       timeout: 5s
       # retries: 5
-    networks:
-      - trino-ranger-net
+    # networks:
+    #   - trino-ranger-net
 
 # 🔹 Volumes
 volumes:
