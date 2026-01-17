@@ -4,7 +4,11 @@ ENV TRINO_CONFIG=/etc/trino
 ENV TRINO_CERTS=/usr/lib/trino/certs 
 
 USER root
+# This explicitly enables unlimited strength crypto if restricted
+RUN sed -i 's/crypto.policy=limited/crypto.policy=unlimited/' /usr/lib/jvm/default-jvm/conf/security/java.security || true
 
+# Force the JVM to allow the specific ciphers Trino needs for LDAP
+ENV JAVA_TOOL_OPTIONS="-Djdk.tls.client.cipherSuites=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384"
 
 RUN mkdir -p ${TRINO_CONFIG} ${TRINO_CERTS} /usr/lib/trino/plugin/ranger /var/trino/data
 
