@@ -29,7 +29,6 @@ services:
       #   - "ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:65.0.150.75"
       environment:
         - CATALOG_MANAGEMENT=dynamic
-        - JAVA_TOOL_OPTIONS=-Djdk.tls.client.protocols=TLSv1.2 -Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true -Djavax.net.ssl.trustStore=/usr/lib/trino/certs/keystore.jks -Djavax.net.ssl.trustStorePassword=changeit
       volumes:
         # 1. Main config mapping
         - ./config:/etc/trino
