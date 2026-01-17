@@ -35,7 +35,7 @@ RUN keytool -delete -alias ldap-ca -keystore ${TRINO_CERTS}/keystore.jks -storep
 # Fix permissions
 RUN chown -R trino:trino /usr/lib/trino/plugin/ranger ${TRINO_CERTS} /var/trino /etc/trino
 
-# Symbolic Link
-RUN ln -sf /usr/lib/trino/plugin/ranger/ranger-trino-security.xml ${TRINO_CONFIG}/ranger-trino-security.xml
+# # Symbolic Link
+# RUN ln -sf /usr/lib/trino/plugin/ranger/ranger-trino-security.xml ${TRINO_CONFIG}/ranger-trino-security.xml
 
 USER trino
