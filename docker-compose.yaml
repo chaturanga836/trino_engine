@@ -37,6 +37,8 @@ services:
         - ./config/node.properties:/etc/trino/node.properties
         - ./config/password-authenticator.properties:/etc/trino/password-authenticator.properties
         - ./config/access-control.properties:/etc/trino/access-control.properties
+        - ./config/ranger-trino-security.xml:/etc/trino/ranger-trino-security.xml
+        
         # 2. Ranger plugin libraries (must match the Dockerfile chown path)
         - ./plugin:/usr/lib/trino/plugin/ranger
         # 3. IMPORTANT: DO NOT mount ./trino-certs:/certs here. 
