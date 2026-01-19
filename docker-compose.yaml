@@ -38,6 +38,7 @@ services:
         - ./config/password-authenticator.properties:/etc/trino/password-authenticator.properties
         - ./config/access-control.properties:/etc/trino/access-control.properties
         - ./config/ranger-trino-security.xml:/etc/trino/ranger-trino-security.xml
+        - ./config/catalog/hudi.properties:/etc/trino/catalog/hudi.properties
         
         # 2. Ranger plugin libraries (must match the Dockerfile chown path)
         - ./plugin:/usr/lib/trino/plugin/ranger
