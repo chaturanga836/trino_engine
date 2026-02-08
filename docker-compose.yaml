@@ -1,95 +1,48 @@
 version: "3.9"
 
 services:
-
-  # 🔐 Generate TLS keystore for Trino
-  trino-certgen:
-    image: eclipse-temurin:17-jdk
-    container_name: trino-certgen
-    volumes:
-      - ./trino-certs:/certs
-    entrypoint: >
-         sh -c "if [ ! -f /certs/keystore.jks ]; then echo 'Generating Trino TLS keystore'; keytool -genkeypair -alias trino -keyalg RSA -keysize 2048 -validity 3650 -keystore /certs/keystore.jks -storepass changeit -keypass changeit -dname 'CN=trino, OU=IT, O=MyCompany, L=City, S=State, C=US'; fi"
-
-  # 🐳 Trino service
+  # 🐳 Trino Service
   trino:
-      build:
-        context: .
-        dockerfile: Dockerfile.trino
-      container_name: trino
-      hostname: trino
-      
-      depends_on:
-        - trino-certgen
-        - auth-service
-      ports:
-        - "8443:8443"
-        - "4001:8080"
-      # extra_hosts:
-      #   - "ec2-65-0-150-75.ap-south-1.compute.amazonaws.com:65.0.150.75"
-      environment:
-        - CATALOG_MANAGEMENT=dynamic
-      volumes:
-        # 1. Main config mapping
-        # - ./config:/etc/trino
-        - ./config/config.properties:/etc/trino/config.properties
-        - ./config/jvm.config:/etc/trino/jvm.config
-        - ./config/node.properties:/etc/trino/node.properties
-        - ./config/password-authenticator.properties:/etc/trino/password-authenticator.properties
-        - ./config/access-control.properties:/etc/trino/access-control.properties
-        - ./config/ranger-trino-security.xml:/etc/trino/ranger-trino-security.xml
-        - ./config/catalog/hudi.properties:/etc/trino/catalog/hudi.properties
-        - ./config/catalog/hive.properties:/etc/trino/catalog/hive.properties
-        
-        # 2. Ranger plugin libraries (must match the Dockerfile chown path)
-        - ./plugin:/usr/lib/trino/plugin/ranger
-        # 3. IMPORTANT: DO NOT mount ./trino-certs:/certs here. 
-        # Doing so would overwrite the keystore you updated in the Dockerfile.
-      healthcheck:
-        test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
-        interval: 10s
-        timeout: 5s
-      networks:
-        - trino-ranger-net
-        - ldap_service_ldap_network
-
-  # 🛡️ Auth-service for JWT
-  auth-service:
     build:
-      context: ./auth-service
-      dockerfile: Dockerfile
-    container_name: trino-auth
+      context: .
+      dockerfile: Dockerfile.trino
+      args:
+        # This pulls CA_FILENAME from your .env file
+        - CA_FILE_NAME=${CA_FILENAME}
+    container_name: trino
+    hostname: trino
     ports:
-      - "7000:7000"
+      - "8443:8443" # HTTPS (OIDC Redirects)
+      - "4001:8080" # HTTP
     environment:
-      - PYTHONUNBUFFERED=1
-      - APP_ENV=prod
-      - DATABASE_URL=postgresql://postgres:2324@144.24.127.112:5432/auth_db
-      - RANGER_BASE_URL=http://144.24.127.112:6080
-      - RANGER_USER=admin
-      - RANGER_PASSWORD=Admin@123
-      - PRIVATE_KEY_PATH=/app/keys/trino_private.pem
-      - PUBLIC_KEY_PATH=/app/keys/public_key.pem
-      - JWT_ISSUER=http://trino-auth:7000
+      - CATALOG_MANAGEMENT=dynamic
     volumes:
-      - ./auth-service/app/keys/trino_private.pem:/app/keys/trino_private.pem:ro
-      - ./auth-service/app/keys/public_key.pem:/app/keys/public_key.pem:ro
+      # Configurations
+      - ./config/config.properties:/etc/trino/config.properties
+      - ./config/jvm.config:/etc/trino/jvm.config
+      - ./config/node.properties:/etc/trino/node.properties
+      # We use file-based access control instead of OPA for now
+      - ./config/access-control.properties:/etc/trino/access-control.properties
+      - ./config/rules.json:/etc/trino/rules.json
+      
+      # Catalogs
+      - ./config/catalog/hudi.properties:/etc/trino/catalog/hudi.properties
+      - ./config/catalog/hive.properties:/etc/trino/catalog/hive.properties
+      
+      # Data
+      - trino-data:/var/trino/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:7000/health"]
+      test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
       interval: 10s
       timeout: 5s
-      # retries: 5
     networks:
-      - trino-ranger-net
+      - trino-net
 
 # 🔹 Volumes
 volumes:
   trino-data:
-  trino-certs:
 
 # 🔹 Networks
 networks:
-  trino-ranger-net:
+  trino-net:
     driver: bridge
-  ldap_service_ldap_network:
-    external: true
