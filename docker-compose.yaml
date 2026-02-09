@@ -1,48 +1,61 @@
 version: "3.9"
 
 services:
-  # 🐳 Trino Service
-  trino:
+  # 👑 Trino Coordinator (The Brain)
+  trino-coordinator:
     build:
       context: .
       dockerfile: Dockerfile.trino
       args:
-        # This pulls CA_FILENAME from your .env file
         - CA_FILE_NAME=${CA_FILENAME}
-    container_name: trino
-    hostname: trino
+    container_name: trino-coordinator
+    hostname: trino-coordinator
     ports:
-      - "8443:8443" # HTTPS (OIDC Redirects)
-      - "4001:8080" # HTTP
+      - "8443:8443" # External HTTPS for UI/API
+      - "4001:8080" # External HTTP
     environment:
       - CATALOG_MANAGEMENT=dynamic
     volumes:
-      # Configurations
-      - ./config/config.properties:/etc/trino/config.properties
+      # Specific Coordinator Configs
+      - ./config/coordinator/config.properties:/etc/trino/config.properties
+      - ./config/coordinator/node.properties:/etc/trino/node.properties
+      # Shared Configs
       - ./config/jvm.config:/etc/trino/jvm.config
-      - ./config/node.properties:/etc/trino/node.properties
-      # We use file-based access control instead of OPA for now
       - ./config/access-control.properties:/etc/trino/access-control.properties
-      # - ./config/rules.json:/etc/trino/rules.json
-      
       # Catalogs
-      - ./config/catalog/hudi.properties:/etc/trino/catalog/hudi.properties
-      - ./config/catalog/hive.properties:/etc/trino/catalog/hive.properties
-      
-      # Data
-      - trino-data:/var/trino/data
-    healthcheck:
-      test: ["CMD", "curl", "-k", "https://localhost:8443/v1/info"]
-      interval: 10s
-      timeout: 5s
+      - ./config/catalog:/etc/trino/catalog
+      - trino-coordinator-data:/var/trino/data
     networks:
       - trino-net
 
-# 🔹 Volumes
-volumes:
-  trino-data:
+  # 🔨 Trino Worker (The Muscle)
+  trino-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.trino
+      args:
+        - CA_FILE_NAME=${CA_FILENAME}
+    container_name: trino-worker-1
+    hostname: trino-worker-1
+    # No ports exposed to host! Only talks to Coordinator via trino-net
+    environment:
+      - CATALOG_MANAGEMENT=dynamic
+    volumes:
+      # Specific Worker Configs
+      - ./config/worker/config.properties:/etc/trino/config.properties
+      - ./config/worker/node.properties:/etc/trino/node.properties
+      # Shared Configs
+      - ./config/jvm.config:/etc/trino/jvm.config
+      # Workers need catalogs too to fetch data
+      - ./config/catalog:/etc/trino/catalog
+      - trino-worker-data:/var/trino/data
+    networks:
+      - trino-net
 
-# 🔹 Networks
+volumes:
+  trino-coordinator-data:
+  trino-worker-data:
+
 networks:
   trino-net:
     driver: bridge
