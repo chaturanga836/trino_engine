@@ -26,7 +26,9 @@ services:
       - ./config/catalog:/etc/trino/catalog
       - trino-coordinator-data:/var/trino/data
     networks:
-      - trino-net
+      trino-net:
+        aliases:
+          - trino-coordinator
 
   # 🔨 Trino Worker (The Muscle)
   trino-worker:
@@ -40,6 +42,8 @@ services:
     # No ports exposed to host! Only talks to Coordinator via trino-net
     environment:
       - CATALOG_MANAGEMENT=dynamic
+    depends_on:
+      - trino-coordinator
     volumes:
       # Specific Worker Configs
       - ./config/worker/config.properties:/etc/trino/config.properties
@@ -51,7 +55,9 @@ services:
       - trino-worker-data:/var/trino/data
       - ./trino-certs:/usr/lib/trino/certs
     networks:
-      - trino-net
+          trino-net:
+            aliases:
+              - trino-worker-1
 
 volumes:
   trino-coordinator-data:
