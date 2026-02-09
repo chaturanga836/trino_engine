@@ -30,4 +30,4 @@ internal-communication.https.keystore.path=/usr/lib/trino/certs/keystore.jks
 internal-communication.https.keystore.key=changeit
 
 # --- Discovery ---
-discovery.uri=https://localhost:8443
+discovery.uri=https://trino-coordinator:8443
