@@ -49,6 +49,7 @@ services:
       # Workers need catalogs too to fetch data
       - ./config/catalog:/etc/trino/catalog
       - trino-worker-data:/var/trino/data
+      - ./trino-certs:/usr/lib/trino/certs
     networks:
       - trino-net
 
