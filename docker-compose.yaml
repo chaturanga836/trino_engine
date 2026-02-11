@@ -26,7 +26,7 @@ services:
       - ./config/catalog:/etc/trino/catalog
       - trino-coordinator-data:/var/trino/data
     networks:
-      trino-net:
+      trino-ranger-net:
         aliases:
           - trino-coordinator
 
@@ -55,7 +55,7 @@ services:
       - trino-worker-data:/var/trino/data
       - ./trino-certs:/usr/lib/trino/certs
     networks:
-          trino-net:
+          trino-ranger-net:
             aliases:
               - trino-worker-1
 
@@ -64,5 +64,6 @@ volumes:
   trino-worker-data:
 
 networks:
-  trino-net:
-    driver: bridge
+  trino-ranger-net:
+    external: true
+    name: trino_engine_trino-ranger-net
